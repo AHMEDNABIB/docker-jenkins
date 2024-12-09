@@ -1,49 +1,35 @@
-def gv
-
 pipeline {
     agent any
-    environment{
-        NEW_VERSION ='1.3.0'
-        // SERVER_CREDENTIALS = credentials('server-credentials')
+    tools {
+        maven 'maven-3.9'
     }
-
     stages {
-        stage("init"){
-            steps{
+        stage("build jar"){
+            steps {
                 script{
-                    gv = load "script.groovy"
+                    echo "building the application..."
+                    sh 'mvn package'
                 }
             }
         }
-        stage("build"){
-            steps{
+
+        stage("build image"){
+            steps {
                 script{
-                    gv.buildApp()
+                    echo "building the application..."
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'PASS', usernameVariable: 'USER')]){
+                        sh 'docker build -t ahmednabib123/demo-app:jma-2.0 .'
+                        sh 'echo $PASS | docker login -u $USER --password-stdin'
+                        sh 'docker push ahmednabib123/demo-app:jma-2.0'
+                    }
                 }
-                
-
-            }
-        }
-
-        stage("test"){
-            
-            steps{
-                script{
-                    gv.testApp()
-                }
-
             }
         }
 
         stage("deploy"){
-            steps {
-                echo "Deploying the application"
-                // echo "deploying with ${SERVER_CREDENTIALS}"
-                // sh "${SERVER_CREDENTIALS}"
-                withCredentials([
-                    usernamePassword(credentialsId: 'server-credentials', usernameVariable: 'USER', passwordVariable: 'PWD')
-                ]) {
-                    sh "echo Deploying with username ${USER} and password ${PWD}"
+            steps{
+                script{
+                    echo "deploying the application..."
                 }
             }
         }
