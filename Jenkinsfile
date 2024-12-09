@@ -9,7 +9,7 @@ pipeline {
         stage("build"){
             steps{
                 echo "building the application"
-                eco "building version ${NEW_VERSION}"
+                echo "building version ${NEW_VERSION}"
 
             }
         }
