@@ -14,6 +14,11 @@ pipeline {
         }
 
         stage("build image"){
+            when {
+                expression {
+                    BRANCH_NAME == "master"
+                }
+            } 
             steps {
                 script{
                     echo "building the application..."
@@ -27,6 +32,11 @@ pipeline {
         }
 
         stage("deploy"){
+            when {
+                expression {
+                    BRANCH_NAME == "master"
+                }
+            }
             steps{
                 script{
                     echo "deploying the application..."
